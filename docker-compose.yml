@@ -1,0 +1,20 @@
+services:
+  dpi-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dpi-engine-web:latest
+    container_name: dpi-engine-web
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist uploaded captures and generated reports across container restarts.
+      - ./backend/uploads:/app/backend/uploads
+      - ./backend/reports:/app/backend/reports
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

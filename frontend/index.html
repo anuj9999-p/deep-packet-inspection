@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DPI Engine &mdash; Deep Packet Inspection Console</title>
+<meta name="description" content="Upload a PCAP capture and get an instant protocol-level analysis powered by a native C++ DPI engine." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ============================= NAV ============================= -->
+<header class="topbar">
+  <div class="topbar__inner">
+    <a href="#top" class="brand">
+      <span class="brand__glyph">&#10148;</span>
+      <span class="brand__text">DPI<span class="brand__accent">Engine</span></span>
+    </a>
+    <nav class="topnav">
+      <a href="#about">Engine</a>
+      <a href="#upload">Analyze</a>
+      <a href="#results">Results</a>
+    </nav>
+    <a href="#upload" class="btn btn--ghost topbar__cta">Upload Capture</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============================= HERO ============================= -->
+  <section class="hero" id="hero">
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow"><span class="eyebrow__dot"></span> Native C++17 packet engine &middot; running live</p>
+        <h1 class="hero__title">
+          Inspect every packet.<br>
+          <span class="hero__title-accent">Trust the wire, not the label.</span>
+        </h1>
+        <p class="hero__subtitle">
+          Drop in a <code>.pcap</code> capture and the DPI engine reads it frame-by-frame &mdash;
+          Ethernet, IPv4, TCP/UDP &mdash; and returns a full protocol breakdown, flow
+          classification, and a downloadable analysis report. No sampling. No guesswork.
+        </p>
+        <div class="hero__actions">
+          <a href="#upload" class="btn btn--primary">Analyze a PCAP <span class="btn__arrow">&rarr;</span></a>
+          <a href="#about" class="btn btn--outline">How the engine works</a>
+        </div>
+        <dl class="hero__stats">
+          <div><dt>Engine core</dt><dd>C++17</dd></div>
+          <div><dt>Parses</dt><dd>Ethernet / IPv4 / TCP / UDP</dd></div>
+          <div><dt>Output</dt><dd>report.json + output.pcap</dd></div>
+        </dl>
+      </div>
+      <div class="hero__panel" aria-hidden="true">
+        <div class="scope">
+          <div class="scope__head">
+            <span class="scope__dot scope__dot--red"></span>
+            <span class="scope__dot scope__dot--amber"></span>
+            <span class="scope__dot scope__dot--green"></span>
+            <span class="scope__title">packet_analyzer &mdash; live capture</span>
+          </div>
+          <div class="scope__body" id="scopeFeed">
+            <!-- populated by script.js: scrolling hex/flow ticker -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= ABOUT ============================= -->
+  <section class="about" id="about">
+    <div class="section-head">
+      <p class="eyebrow eyebrow--muted">The engine</p>
+      <h2>One binary. Three protocol layers. Zero shortcuts.</h2>
+      <p class="section-lede">
+        The web layer you're looking at is just glue. All inspection work &mdash; reading the
+        raw PCAP frames, walking the Ethernet/IP/TCP/UDP headers, and classifying traffic &mdash;
+        happens inside a compiled C++ binary. FastAPI hands it a file and reports back exactly
+        what the engine found.
+      </p>
+    </div>
+
+    <div class="cards cards--3">
+      <article class="card">
+        <div class="card__icon card__icon--blue">01</div>
+        <h3>Frame-accurate parsing</h3>
+        <p>Reads the PCAP global header and every packet record directly from bytes &mdash;
+           handling both native and byte-swapped captures &mdash; then decodes Ethernet,
+           IPv4, TCP, and UDP headers field by field.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--cyan">02</div>
+        <h3>Flow &amp; protocol classification</h3>
+        <p>Every packet is tagged by transport protocol and, where applicable, by
+           well-known application ports &mdash; HTTP, HTTPS, and DNS &mdash; with source and
+           destination endpoints tracked across the whole capture.</p>
+      </article>
+      <article class="card">
+        <div class="card__icon card__icon--blue">03</div>
+        <h3>Reproducible artifacts</h3>
+        <p>Each run emits a machine-readable <code>report.json</code> and a passthrough
+           <code>output.pcap</code>, so results can be automated, diffed, or re-opened in
+           Wireshark.</p>
+      </article>
+    </div>
+
+    <div class="pipeline" role="img" aria-label="Pipeline: PCAP upload, FastAPI, C++ engine, JSON report and output PCAP">
+      <div class="pipeline__step">
+        <span class="pipeline__label">01</span>
+        <strong>Upload</strong>
+        <span>.pcap via browser</span>
+      </div>
+      <span class="pipeline__arrow">&rarr;</span>
+      <div class="pipeline__step">
+        <span class="pipeline__label">02</span>
+        <strong>FastAPI</strong>
+        <span>saves file, spawns subprocess</span>
+      </div>
+      <span class="pipeline__arrow">&rarr;</span>
+      <div class="pipeline__step pipeline__step--core">
+        <span class="pipeline__label">03</span>
+        <strong>packet_analyzer</strong>
+        <span>native C++ DPI core</span>
+      </div>
+      <span class="pipeline__arrow">&rarr;</span>
+      <div class="pipeline__step">
+        <span class="pipeline__label">04</span>
+        <strong>report.json</strong>
+        <span>+ output.pcap</span>
+      </div>
+      <span class="pipeline__arrow">&rarr;</span>
+      <div class="pipeline__step">
+        <span class="pipeline__label">05</span>
+        <strong>Dashboard</strong>
+        <span>rendered below</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= UPLOAD ============================= -->
+  <section class="upload" id="upload">
+    <div class="section-head">
+      <p class="eyebrow eyebrow--muted">Run an analysis</p>
+      <h2>Upload a capture</h2>
+      <p class="section-lede">Accepts standard <code>.pcap</code> files. The file never leaves this server &mdash; it's handed straight to the local analyzer process.</p>
+    </div>
+
+    <div class="upload__layout">
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload PCAP file, click or drag and drop">
+        <input type="file" id="fileInput" accept=".pcap" hidden />
+        <div class="dropzone__icon">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16V18.5C4 19.8807 5.11929 21 6.5 21H17.5C18.8807 21 20 19.8807 20 18.5V16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="dropzone__title">Drag &amp; drop your <code>.pcap</code> file here</p>
+        <p class="dropzone__sub">or</p>
+        <button type="button" class="btn btn--outline" id="browseBtn">Browse file</button>
+        <p class="dropzone__filename" id="fileName" aria-live="polite">No file selected</p>
+      </div>
+
+      <div class="upload__panel">
+        <h3>Run configuration</h3>
+        <ul class="config-list">
+          <li><span>Engine</span><strong>packet_analyzer (C++17)</strong></li>
+          <li><span>Input format</span><strong>.pcap</strong></li>
+          <li><span>Timeout</span><strong>300s</strong></li>
+          <li><span>Output</span><strong>report.json, output.pcap</strong></li>
+        </ul>
+        <button type="button" class="btn btn--primary btn--block" id="analyzeBtn" disabled>
+          <span id="analyzeBtnLabel">Analyze capture</span>
+        </button>
+        <div class="progress" id="progress" hidden>
+          <div class="progress__spinner" aria-hidden="true"></div>
+          <div class="progress__text">
+            <strong>Running packet_analyzer&hellip;</strong>
+            <span>Parsing frames and building the report</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================= RESULTS ============================= -->
+  <section class="results" id="results">
+    <div class="section-head">
+      <p class="eyebrow eyebrow--muted">Output</p>
+      <h2>Analysis dashboard</h2>
+      <p class="section-lede">Populated directly from the engine's <code>report.json</code> after a successful run.</p>
+    </div>
+
+    <div class="results__empty" id="resultsEmpty">
+      <div class="results__empty-icon">&#9679;&#9679;&#9679;</div>
+      <p>No analysis yet. Upload a PCAP file above to see live results here.</p>
+    </div>
+
+    <div class="results__content" id="resultsContent" hidden>
+
+      <div class="stat-grid" id="statGrid">
+        <div class="stat-card stat-card--total">
+          <span class="stat-card__label">Total Packets</span>
+          <span class="stat-card__value" id="statTotal">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">TCP</span>
+          <span class="stat-card__value" id="statTcp">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">UDP</span>
+          <span class="stat-card__value" id="statUdp">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">ICMP</span>
+          <span class="stat-card__value" id="statIcmp">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">HTTP</span>
+          <span class="stat-card__value" id="statHttp">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">HTTPS</span>
+          <span class="stat-card__value" id="statHttps">&mdash;</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card__label">DNS</span>
+          <span class="stat-card__value" id="statDns">&mdash;</span>
+        </div>
+      </div>
+
+      <div class="results__row">
+        <div class="panel panel--endpoint">
+          <h3>Top Source IP</h3>
+          <p class="endpoint__ip" id="topSourceIp">&mdash;</p>
+          <p class="endpoint__count" id="topSourceCount">&nbsp;</p>
+        </div>
+        <div class="panel panel--endpoint">
+          <h3>Top Destination IP</h3>
+          <p class="endpoint__ip" id="topDestIp">&mdash;</p>
+          <p class="endpoint__count" id="topDestCount">&nbsp;</p>
+        </div>
+        <div class="panel panel--meta">
+          <h3>Run details</h3>
+          <ul class="meta-list">
+            <li><span>File</span><strong id="metaFile">&mdash;</strong></li>
+            <li><span>Job ID</span><strong id="metaJob">&mdash;</strong></li>
+            <li><span>Parse errors</span><strong id="metaErrors">&mdash;</strong></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="panel panel--distribution">
+        <h3>Protocol Distribution</h3>
+        <div class="dist" id="distBars"></div>
+      </div>
+
+      <div class="results__actions">
+        <button type="button" class="btn btn--outline" id="downloadReportBtn">Download report.json</button>
+        <button type="button" class="btn btn--outline" id="downloadOutputBtn">Download output.pcap</button>
+        <button type="button" class="btn btn--ghost" id="toggleConsoleBtn">View console log</button>
+      </div>
+
+      <pre class="console-log" id="consoleLog" hidden></pre>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============================= FOOTER ============================= -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__brand">
+      <span class="brand__glyph">&#10148;</span>
+      <span class="brand__text">DPI<span class="brand__accent">Engine</span></span>
+    </div>
+    <p class="footer__note">Core packet inspection engine written in C++17. Web console built with FastAPI and vanilla JavaScript &mdash; no frontend framework.</p>
+    <div class="footer__badges">
+      <span class="badge">C++17</span>
+      <span class="badge">FastAPI</span>
+      <span class="badge">Vanilla JS</span>
+      <span class="badge">Docker</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="assertive"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

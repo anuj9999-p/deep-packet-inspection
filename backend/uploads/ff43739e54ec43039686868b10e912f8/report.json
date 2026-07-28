@@ -1,0 +1,31 @@
+{
+  "source_file": "input.pcap",
+  "total_packets": 77,
+  "total_bytes": 5738,
+  "parse_errors": 0,
+  "protocol_counts": {
+    "tcp": 73,
+    "udp": 4,
+    "icmp": 0,
+    "other": 0
+  },
+  "application_counts": {
+    "http": 4,
+    "https": 69,
+    "dns": 4
+  },
+  "protocol_distribution": {
+    "TCP": 94.81,
+    "UDP": 5.19,
+    "ICMP": 0.00,
+    "Other": 0.00
+  },
+  "top_source_ip": {
+    "ip": "192.168.1.100",
+    "count": 56
+  },
+  "top_destination_ip": {
+    "ip": "192.168.1.100",
+    "count": 16
+  }
+}
